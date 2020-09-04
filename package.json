@@ -1,0 +1,21 @@
+{
+  "name": "donaciones-back",
+  "version": "1.0.0",
+  "description": "App de donaciones por PayU",
+  "main": "index.js",
+  "scripts": {
+    "dev": "npx nodemon index.js",
+    "start": "node index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "helmet": "^4.1.0",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.4"
+  }
+}
