@@ -7,7 +7,7 @@ const acountID = config.test.acountID;
 
 ref = 0;
 
-exports.createCard = function createCard(id, number, name, document, expMonth, expYear, type, addressline1, addressline2, addressline3, addresscity, addressstate, addresscountry, addresspostalCode, addressphone){
+exports.createCard = async function createCard(id, number, name, document, expMonth, expYear, type, addressline1, addressline2, addressline3, addresscity, addressstate, addresscountry, addresspostalCode, addressphone){
     console.log("Creating card");
     ++ref;
     
@@ -52,7 +52,7 @@ exports.createCard = function createCard(id, number, name, document, expMonth, e
     
 }
 
-exports.updateCard = function updateCard(number, name, document, expMonth, expYear, type, addressline1, addressline2, addressline3, addresscity, addressstate, addresscountry, addresspostalCode, addressphone, token){
+exports.updateCard = async function updateCard(number, name, document, expMonth, expYear, type, addressline1, addressline2, addressline3, addresscity, addressstate, addresscountry, addresspostalCode, addressphone, token){
     console.log("Updating Card");
     let formBody = {
         "number": number,
@@ -93,7 +93,7 @@ exports.updateCard = function updateCard(number, name, document, expMonth, expYe
     return PayU.body.token;   
 }
 
-exports.getCard = function getCard(token){
+exports.getCard = async function getCard(token){
     console.log("Consulting card");
 
     let fetchData = {
@@ -115,7 +115,7 @@ exports.getCard = function getCard(token){
 
 }
 
-exports.deleteCard = function deleteCard(id, token){
+exports.deleteCard = async function deleteCard(id, token){
     console.log("Deleting card");
 
     let fetchData = {

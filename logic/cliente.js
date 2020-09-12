@@ -7,7 +7,7 @@ const acountID = config.test.acountID;
 
 let ref = 0;
 
-exports.createClient = function createClient(fullname, email){
+exports.createClient = async function createClient(fullname, email){
     console.log("Creating client");
     ++ref;
     var crypto = require("crypto"); 
@@ -38,7 +38,7 @@ exports.createClient = function createClient(fullname, email){
     return PayU.body.id;
 }
 
-exports.updateClient = function updateClient(fullname, email, id){
+exports.updateClient = async function updateClient(fullname, email, id){
     console.log("Updating client");
     let formBody = {
         "fullname": fullname, 
@@ -66,7 +66,7 @@ exports.updateClient = function updateClient(fullname, email, id){
     return PayU.body.id;
 }
 
-exports.getClient = function getClient(id){
+exports.getClient = async function getClient(id){
     console.log("Consulting client");
 
     let fetchData = {
@@ -87,7 +87,7 @@ exports.getClient = function getClient(id){
     }
 }
 
-exports.deleteClient = function deleteClient(id){
+exports.deleteClient = async function deleteClient(id){
     console.log("Deleting client");
 
     let fetchData = {

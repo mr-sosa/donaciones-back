@@ -19,7 +19,8 @@ app.use(express.json());
 
 // Metodos de lectura de la app
 app.get('/CreateDonation', async (req, res) => {
-    let planCode = await plan.createPlanPago(10000, 3);
+    let planCode = await plan.createPlanPago(11000, 3);
+    //let planCode = await plan.getPlanPago("Plan-Pago-N1-E22841784");
     res.status(200).send(JSON.stringify(planCode));
 });
 
