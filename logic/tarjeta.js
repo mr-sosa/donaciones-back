@@ -7,7 +7,7 @@ const acountID = config.test.acountID;
 
 ref = 0;
 
-exports.createCard = async function createCard(id, number, name, document, expMonth, expYear, type, addressline1, addressline2, addressline3, addresscity, addressstate, addresscountry, addresspostalCode, addressphone){
+exports.createCard = async function createCard(clienteId, number, name, document, expMonth, expYear, type, addressline1, addressline2, addressline3, addresscity, addressstate, addresscountry, addresspostalCode, addressphone){
     console.log("Creating card");
     ++ref;
     
@@ -28,32 +28,38 @@ exports.createCard = async function createCard(id, number, name, document, expMo
             "postalCode": addresspostalCode,
             "phone": addressphone
         }
-    }
+    };
 
     let fetchData = {
         method: "POST",
         mode: "cors",
         headers: {
             "Content-Type": "application/json",
-            "Authorization": authorization
+            "Authorization": authorization,
+            "Accept": "application/json",
+            "Accept-language": "es",
+            "Host": "sandbox.api.payulatam.com"
         },
-        body : formBody
-    }
+        body : JSON.stringify(formBody)
+
+    };
     
     console.log("Sending request to PayU");
-    let PayU = await fetch(ENDPOINT+"/rest/v4.9/customers/"+ id +"/creditCards", fetchData);
+    let payU = await fetch(ENDPOINT+"rest/v4.9/customers/"+ clienteId +"/creditCards", fetchData);
     
-    if(PayU.errors !== undefined){
-        console.log('PAYU CREATE STATUS: ', payU.status )
-        console.log('ERROR WHILE CREATING LINK: ', payU.errors )
-    }
+    let status = payU.status;
+    payU = await payU.json();
 
-    return PayU.body.token;
+    if(status === 201) return payU.token;
+    
+    console.log('PAYU CREATE CARD STATUS: ', status );
+    console.log("ERROR WHILE CREATING CARD: ", payU.description);
+    return "ERROR_ " + payU.description;
     
 }
 
-exports.updateCard = async function updateCard(number, name, document, expMonth, expYear, type, addressline1, addressline2, addressline3, addresscity, addressstate, addresscountry, addresspostalCode, addressphone, token){
-    console.log("Updating Card");
+exports.updateCard = async function updateCard(token, number, name, document, expMonth, expYear, type, addressline1, addressline2, addressline3, addresscity, addressstate, addresscountry, addresspostalCode, addressphone){
+
     let formBody = {
         "number": number,
         "name": name,
@@ -71,67 +77,85 @@ exports.updateCard = async function updateCard(number, name, document, expMonth,
             "postalCode": addresspostalCode,
             "phone": addressphone
         }
-    }
+    };
+    
     let fetchData = {
         method: "PUT",
         mode: "cors",
         headers: {
-            "Content-Type": "application/json",
-            "Authorization": authorization
+            "Content-Type": 'application/json;charset=utf-8',
+            "Authorization": authorization,
+            "Accept": "application/json",
+            "Accept-language": "es",
+            "Host": "sandbox.api.payulatam.com"
         },
-        body : formBody
-    }
+        body : JSON.stringify(formBody)
+    };
     
     console.log("Sending request to PayU");
-    let PayU = await fetch(ENDPOINT+"/rest/v4.9/creditCards/"+token, fetchData);
+    let payU = await fetch(ENDPOINT+"rest/v4.9/creditCards/"+ token, fetchData);
     
-    if(PayU.errors !== undefined){
-        console.log('PAYU CREATE STATUS: ', payU.status )
-        console.log('ERROR WHILE CREATING LINK: ', payU.errors )
-    }
+    let status = payU.status;
+    payU = await payU.json();
 
-    return PayU.body.token;   
+    if(status === 201) return payU;
+    
+    console.log('PAYU UPDATE CARD STATUS: ', status );
+    console.log("ERROR WHILE UPDATE CARD: ", payU.description);
+    return "ERROR_ " + payU.description;
+       
 }
 
 exports.getCard = async function getCard(token){
-    console.log("Consulting card");
+    console.log("Consulting card: " + token );
 
     let fetchData = {
         method: "GET",
         mode: "cors",
         headers: {
-            "Content-Type": "application/json",
-            "Authorization": authorization
+            "Authorization": authorization,
+            "Accept": "application/json",
+            "Accept-language": "es",
+            "Host": "sandbox.api.payulatam.com"
         }
-    }
+    };
     
     console.log("Sending request to PayU");
-    let PayU = await fetch(ENDPOINT+"/rest/v4.9/creditCards/"+token, fetchData);
+    let payU = await fetch(ENDPOINT+"rest/v4.9/creditCards/"+token, fetchData);
 
-    if(PayU.errors !== undefined){
-        console.log('PAYU CREATE STATUS: ', payU.status )
-        console.log('ERROR WHILE CREATING LINK: ', payU.errors )
-    }
+    let status = payU.status;
+    payU = await payU.json();
 
+    if(status === 200) return payU;
+    console.log('PAYU GET CARD STATUS: ', status );
+    console.log("ERROR WHILE GETTING CARD: ", payU.description);
+    return "ERROR_ " + payU.description;
+    
 }
 
-exports.deleteCard = async function deleteCard(id, token){
-    console.log("Deleting card");
+exports.deleteCard = async function deleteCard(clienteId, token){
+    console.log("Deleting card: " + token);
 
     let fetchData = {
         method: "DELETE",
         mode: "cors",
         headers: {
-            "Content-Type": "application/json",
-            "Authorization": authorization
+            "Authorization": authorization,
+            "Accept": "application/json",
+            "Accept-language": "es",
+            "Host": "sandbox.api.payulatam.com"
         }
-    }
+    };
     
     console.log("Sending request to PayU");
-    let PayU = await fetch(ENDPOINT+"/rest/v4.9/customers/"+ id +"/creditCards/"+token, fetchData);
+    let payU = await fetch(ENDPOINT+"rest/v4.9/customers/"+ clienteId +"/creditCards/"+token, fetchData);
+    
+    let status = payU.status;
 
-    if(PayU.errors !== undefined){
-        console.log('PAYU CREATE STATUS: ', payU.status )
-        console.log('ERROR WHILE CREATING LINK: ', payU.errors )
-    }
+    if(status === 200) return status;
+
+    payU = await payU.json()
+    console.log('PAYU DELETE CARD STATUS: ', status );
+    console.log("ERROR WHILE DELETING CARD: ", payU.description);
+    return "ERROR_ " + payU.description;
 }
