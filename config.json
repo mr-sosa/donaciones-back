@@ -10,5 +10,9 @@
         "acountID": "",
         "authorization": "Basic ",
         "endPoint": "https://api.payulatam.com/payments-api/"
+    },
+    "podio": {
+        "appID": 25101570,
+        "appToken": "d4f96940eb1a48d19e39ed0222970df7"
     }
 }

@@ -12,9 +12,11 @@
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.17.1",
+    "fs": "0.0.1-security",
     "helmet": "^4.1.0",
     "morgan": "^1.10.0",
-    "node-fetch": "^2.6.1"
+    "node-fetch": "^2.6.1",
+    "podio-js": "^1.6.1"
   },
   "devDependencies": {
     "nodemon": "^2.0.4"
