@@ -4,10 +4,13 @@ const cors = require('cors');
 const helmet = require('helmet');
 const app = express();
 
+const conf = require('./config.json');
 const cliente = require('./logic/cliente');
 const plan = require('./logic/planPago');
 const suscripcion = require('./logic/suscripcion');
 const tarjeta = require('./logic/tarjeta');
+const podio = require('./podio/podioClient');
+const confPodio = conf.podio.appID;
 
 const port = process.env.PORT || 2000;
 
@@ -18,12 +21,37 @@ app.use(morgan('tiny'));
 app.use(express.json());
 
 // Metodos de lectura de la app
-app.get('/CreateDonation', async (req, res) => {
-    let planCode = await plan.createPlanPago(11000, 3);
-    let clienteId = await cliente.createClient("Andrea Gomez", "andre@aiesec.net");
-    let cardToken = await tarjeta.createCard(clienteId, 5476254935288131, "Benito Taibo", "78945641", 8, 24, "MASTERCARD", "calle falsa 1", "Calle falsa 2", "Calle falsa 3", "Bogota", "Cundinamarca", "CO", "57", "2154");
+app.post('/CreateDonation', async (req, res) => {
+
+    //Conexión con API PayU
+    let dataReq = req.body;
+
+    let planCode = await plan.createPlanPago(dataReq.AmountForm.amount, dataReq.AmountForm.duration);
+    let clienteId = await cliente.createClient(dataReq.DonatorForm.fullNameClient, dataReq.DonatorForm.emailClient);
+    let cardToken = await tarjeta.createCard(clienteId, dataReq.CardForm.cardNumber, dataReq.CardForm.cardOwner, 
+                                            dataReq.CardForm.idOwnerNumber, dataReq.CardForm.expMonth, dataReq.CardForm.expYear,
+                                            dataReq.CardForm.cardType, dataReq.CardForm.address, '', '', dataReq.CardForm.city, '', 
+                                            dataReq.CardForm.country, '', dataReq.CardForm.phoneNumber);
     let subscriptionId = await suscripcion.createSubscription(planCode,clienteId,cardToken);
-    res.status(200).send(JSON.stringify({"planCode": planCode,"id": clienteId, "token": cardToken, "subscriptionId": subscriptionId}));
+    
+    //Conexión con API Podio
+    let today = new Date();
+    let dataPodio = {
+        "fechaDonacion": today.getFullYear()+"-"+(today.getMonth()+1)+"-"+today.getDate(),
+        "nombre": dataReq.DonatorForm.fullNameClient,
+        "documento": dataReq.DonatorForm.idNumberClient,
+        "email": dataReq.DonatorForm.emailClient,
+        "telefono": dataReq.CardForm.phoneNumber,
+        "amount": dataReq.AmountForm.amount,
+        "nPagos": dataReq.AmountForm.duration,
+        "tokenID": cardToken,
+        "clienteID": clienteId,
+        "planID": planCode,
+        "suscriptionID": subscriptionId
+    }
+
+    let resPodio = await podio.createDonationPodio(confPodio, dataPodio);
+    if (resPodio === 200) res.status(201).send(JSON.stringify({"planCode": planCode,"id": clienteId, "token": cardToken, "subscriptionId": subscriptionId}));
 });
 
 app.delete('/DeleteDonation', async (req, res) => {

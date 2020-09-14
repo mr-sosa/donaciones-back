@@ -12,6 +12,8 @@
         "endPoint": "https://api.payulatam.com/payments-api/"
     },
     "podio": {
+        "clientId": "node-donation",
+        "clientSecret": "UiA74ndFKT0XKPwTHRHAvHtJlu55OnB8M76n3BnI70rGfJfHENq8fPp8IwS6Sbt3",
         "appID": 25101570,
         "appToken": "d4f96940eb1a48d19e39ed0222970df7"
     }

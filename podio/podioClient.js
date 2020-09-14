@@ -1,9 +1,11 @@
-const fs = require('fs');
-const { config } = require('process');
-const confParams = JSON.parse(fs.readFileSync('../config.json'));
 const podio = require('./podioHandler');
+const fs         = require('fs')
+const confParams = JSON.parse(fs.readFileSync('./config.json'))
+const appPID= confParams.podio.appID;
+const appPToken = confParams.podio.appToken;
 
 exports.createDonationPodio = async function createDonationPodio(appId, item) {
+    console.log("Loading Podio data")
     let info = {
         fields: [
             {
@@ -11,7 +13,7 @@ exports.createDonationPodio = async function createDonationPodio(appId, item) {
                 "type": "date",
                 "field_id": 212749327,
                 "label": "Donation Date",
-                "values": [ { "value": item.fechaDonacion.value } ],
+                "values": [ { "start": item.fechaDonacion + " 00:00:00"} ],
                 "external_id": "donation-date"
             },
             {
@@ -19,7 +21,7 @@ exports.createDonationPodio = async function createDonationPodio(appId, item) {
                 "type": "text",
                 "field_id": 212749286,
                 "label": "Donate",
-                "values": [ { "value": item.nombre.value } ],
+                "values": [ { "value": item.nombre } ],
                 "external_id": "title"
             },
             {
@@ -27,7 +29,7 @@ exports.createDonationPodio = async function createDonationPodio(appId, item) {
                 "type": "number",
                 "field_id": 212749474,
                 "label": "Cédula",
-                "values": [ { "value": item.documento.value } ],
+                "values": [ { "value": parseInt(item.documento) } ],
                 "external_id": "cedula"
             },
             {
@@ -35,7 +37,7 @@ exports.createDonationPodio = async function createDonationPodio(appId, item) {
                 "type": "category",
                 "field_id": 212749336,
                 "label": "Estado",
-                "values": [ { "value": "Activo" } ],
+                "values": [ { "value": 1 } ],
                 "external_id": "estado"
             },
             {
@@ -43,7 +45,7 @@ exports.createDonationPodio = async function createDonationPodio(appId, item) {
                 "type": "text",
                 "field_id": 212749329,
                 "label": "Email",
-                "values": [ { "value": item.email.value } ],
+                "values": [ { "value": item.email } ],
                 "external_id": "email"
             },
             {
@@ -51,15 +53,15 @@ exports.createDonationPodio = async function createDonationPodio(appId, item) {
                 "type": "text",
                 "field_id": 212749328,
                 "label": "Telefono",
-                "values": [ { "value": item.telefono.value } ],
+                "values": [ { "value": item.telefono } ],
                 "external_id": "telefono"
             },
             {
                 "status": "active",
-                "type": "text",
+                "type": "money",
                 "field_id": 212749331,
                 "label": "Donación",
-                "values": [ { "value": item.amount.value } ],
+                "values": [ { "value": parseInt(item.amount), "currency":"USD" } ],
                 "external_id": "donacion"
             },
             {
@@ -67,7 +69,7 @@ exports.createDonationPodio = async function createDonationPodio(appId, item) {
                 "type": "text",
                 "field_id": 212749330,
                 "label": "Número de Pagos",
-                "values": [ { "value": item.nPagos.value } ],
+                "values": [ { "value": item.nPagos } ],
                 "external_id": "numero-de-pagos"
             },
             {
@@ -75,7 +77,7 @@ exports.createDonationPodio = async function createDonationPodio(appId, item) {
                 "type": "text",
                 "field_id": 212749332,
                 "label": "Token ID",
-                "values": [ { "value": item.tokenID.value } ],
+                "values": [ { "value": item.tokenID } ],
                 "external_id": "token-id"
             },
             {
@@ -83,7 +85,7 @@ exports.createDonationPodio = async function createDonationPodio(appId, item) {
                 "type": "text",
                 "field_id": 212749333,
                 "label": "Donate ID",
-                "values": [ { "value": item.clienteID.value } ],
+                "values": [ { "value": item.clienteID } ],
                 "external_id": "donate-id"
             },
             {
@@ -91,7 +93,7 @@ exports.createDonationPodio = async function createDonationPodio(appId, item) {
                 "type": "text",
                 "field_id": 212749334,
                 "label": "Plan ID",
-                "values": [ { "value": item.planID.value } ],
+                "values": [ { "value": item.planID } ],
                 "external_id": "plan-id"
             },
             {
@@ -99,14 +101,31 @@ exports.createDonationPodio = async function createDonationPodio(appId, item) {
                 "type": "text",
                 "field_id": 212749335,
                 "label": "Suscription ID",
-                "values": [ { "value": item.suscriptionID.value } ],
+                "values": [ { "value": item.suscriptionID } ],
                 "external_id": "suscription-id"
             }
         ]
     }
 
-    let appPID= confParams.podio.appID;
-    let appPToken = confParams.podio.appToken;
+    console.log("Sending request to Podio"); 
+    
+    let resp = await podio.newItem(appId, info, appPID, appPToken).catch(console.log);
+    
+    if(resp === 200) return 200;
+    return resp;
+}
+exports.getDonationPodio = async function getDonationPodio(id) {
+    let x = await podio.getItem(id,appPID,appPToken);
+    console.log(x)
+    /*for (i in x.fields) {
+        xx = x.fields[i].values;
+        console.log(x.fields[i].label+"-"+x.fields[i].type)
+        console.log(xx);
+    }*/
+}
 
-    await podio.newItem(appId, info, appPID, appPToken).catch(console.log);
+exports.getAllDonationPodio = async function getAllDonationPodio() {
+    let x = await podio.getAllItems(appPID,appPToken);
+    console.log(x)
+
 }
