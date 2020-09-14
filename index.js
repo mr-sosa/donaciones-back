@@ -27,13 +27,32 @@ app.post('/CreateDonation', async (req, res) => {
     let dataReq = req.body;
 
     let planCode = await plan.createPlanPago(dataReq.AmountForm.amount, dataReq.AmountForm.duration);
+    if(planCode.startsWith('ERROR_')) {
+        planCode = planCode.replace('ERROR_ ', '');
+        res.status(400).send(JSON.stringify({"error": planCode}));
+    }
+
     let clienteId = await cliente.createClient(dataReq.DonatorForm.fullNameClient, dataReq.DonatorForm.emailClient);
+    if (clienteId.startsWith('ERROR_')){
+        clienteId = clienteId.replace('ERROR_ ', '');
+        res.status(400).send(JSON.stringify({"error": clienteId}));
+    }
+
     let cardToken = await tarjeta.createCard(clienteId, dataReq.CardForm.cardNumber, dataReq.CardForm.cardOwner, 
                                             dataReq.CardForm.idOwnerNumber, dataReq.CardForm.expMonth, dataReq.CardForm.expYear,
                                             dataReq.CardForm.cardType, dataReq.CardForm.address, '', '', dataReq.CardForm.city, '', 
                                             dataReq.CardForm.country, '', dataReq.CardForm.phoneNumber);
+    if (cardToken.startsWith('ERROR_')){
+        cardToken = cardToken.replace('ERROR_ ', '');
+        res.status(400).send(JSON.stringify({"error": cardToken}));
+    }
+
     let subscriptionId = await suscripcion.createSubscription(planCode,clienteId,cardToken);
-    
+    if (subscriptionId.startsWith('ERROR_')){
+        subscriptionId = subscriptionId.replace('ERROR_ ', '');
+        res.status(400).send(JSON.stringify({"error": suscriptionID}));
+    }
+
     //Conexión con API Podio
     let today = new Date();
     let dataPodio = {
@@ -52,6 +71,10 @@ app.post('/CreateDonation', async (req, res) => {
 
     let resPodio = await podio.createDonationPodio(confPodio, dataPodio);
     if (resPodio === 200) res.status(201).send(JSON.stringify({"planCode": planCode,"id": clienteId, "token": cardToken, "subscriptionId": subscriptionId}));
+    else{
+        res.status(400).send(JSON.stringify({"error": resPodio}));
+    }
+       
 });
 
 app.delete('/DeleteDonation', async (req, res) => {
