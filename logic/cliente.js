@@ -1,9 +1,8 @@
 const fetch = require('node-fetch');
 const cors = require('cors');
 const config = require('../config.json');
-const ENDPOINT = config.test.endPoint;
-const authorization = config.test.authorization;
-const acountID = config.test.acountID;
+const ENDPOINT = config.production.endPoint;
+const authorization = config.production.authorization;
 
 let ref = 0;
 
@@ -42,7 +41,7 @@ exports.createClient = async function createClient(fullname, email){
     
     console.log('PAYU CREATE CLIENT STATUS: ', status );
     console.log("ERROR WHILE CREATING CLIENT: ", payU.description);
-    return "ERROR_ " + payU.description;
+    return "ERROR_" + status + "_" + payU.description;
 }
 
 exports.updateClient = async function updateClient(id, fullname, email){
@@ -75,7 +74,7 @@ exports.updateClient = async function updateClient(id, fullname, email){
     
     console.log('PAYU UPDATE CLIENT STATUS: ', status );
     console.log("ERROR WHILE UPDATE CLIENT: ", payU.description);
-    return "ERROR_ " + payU.description; 
+    return "ERROR_" + status + "_" + payU.description;
 }
 
 exports.getClient = async function getClient(id){
@@ -102,7 +101,7 @@ exports.getClient = async function getClient(id){
 
     console.log('PAYU GET CLIENT STATUS: ', status );
     console.log("ERROR WHILE GETTING CLIENT: ", payU.description);
-    return "ERROR_ " + payU.description; 
+    return "ERROR_" + status + "_" + payU.description;
 }
 
 exports.deleteClient = async function deleteClient(id){
@@ -129,5 +128,5 @@ exports.deleteClient = async function deleteClient(id){
     payU = await payU.json()
     console.log('PAYU DELETE CLIENT STATUS: ', status );
     console.log("ERROR WHILE DELETING CLIENT: ", payU.description);
-    return "ERROR_ " + payU.description;
+    return "ERROR_" + status + "_" + payU.description;
 }

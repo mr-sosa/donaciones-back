@@ -1,9 +1,9 @@
 const fetch = require('node-fetch');
 const cors = require('cors');
 const config = require('../config.json');
-const ENDPOINT = config.test.endPoint;
-const authorization = config.test.authorization;
-const acountID = config.test.acountID;
+const ENDPOINT = config.production.endPoint;
+const authorization = config.production.authorization;
+const acountID = config.production.acountID;
 
 let ref = 0;
 
@@ -69,7 +69,7 @@ exports.createPlanPago = async function createPlanPago(amount, nMonth){
     
     console.log('PAYU CREATE PLANPAGO STATUS: ', status );
     console.log("ERROR WHILE CREATING PLANPAGO: ", payU.description);
-    return "ERROR_ " + payU.description;
+    return "ERROR_" + status + "_" + payU.description;
 
 }
 
@@ -94,7 +94,7 @@ exports.getPlanPago = async function getPlanPago(planCode){
     if(status === 200) return payU;
     console.log('PAYU GET PLANPAGO STATUS: ', status );
     console.log("ERROR WHILE GETTING PLANPAGO: ", payU.description);
-    return "ERROR_ " + payU.description;
+    return "ERROR_" + status + "_" + payU.description;
 }
 
 exports.updatePlanPago = async function updatePlanPago(planCode, description, nMonth, amount){
@@ -149,7 +149,7 @@ exports.updatePlanPago = async function updatePlanPago(planCode, description, nM
     
     console.log('PAYU CREATE PLANPAGO STATUS: ', status );
     console.log("ERROR WHILE CREATING PLANPAGO: ", payU.description);
-    return "ERROR_ " + payU.description;
+    return "ERROR_" + status + "_" + payU.description;
 }
 
 exports.deletePlanPago = async function deletePlanPago(planCode){
@@ -174,5 +174,5 @@ exports.deletePlanPago = async function deletePlanPago(planCode){
     payU = await payU.json()
     console.log('PAYU DELETE PLANPAGO STATUS: ', status );
     console.log("ERROR WHILE DELETING PLANPAGO: ", payU.description);
-    return "ERROR_ " + payU.description;
+    return "ERROR_" + status + "_" + payU.description;
 }

@@ -1,9 +1,8 @@
 const fetch = require('node-fetch');
 const cors = require('cors');
 const config = require('../config.json');
-const ENDPOINT = config.test.endPoint;
-const authorization = config.test.authorization;
-const acountID = config.test.acountID;
+const ENDPOINT = config.production.endPoint;
+const authorization = config.production.authorization;
 
 let ref = 0;
 
@@ -50,7 +49,7 @@ exports.createSubscription = async function createSubscription(planCode, cliente
     
     console.log('PAYU CREATE SUBSCRIPTION STATUS: ', status );
     console.log("ERROR WHILE CREATING SUSCRIPTION: ", payU.description);
-    return "ERROR_ " + payU.description;
+    return "ERROR_" + status + "_" + payU.description;
 
 }
 
@@ -93,7 +92,7 @@ exports.updateSubscription = async function updateSubscription(idSub, cardToken,
     
     console.log('PAYU UPDATE SUBSCRIPTION STATUS: ', status );
     console.log("ERROR WHILE UPDATE SUBSCRIPTION: ", payU.description);
-    return "ERROR_ " + payU.description; 
+    return "ERROR_" + status + "_" + payU.description;
 }
 
 exports.getSubscription = async function getSubscription(idSub){
@@ -120,7 +119,7 @@ exports.getSubscription = async function getSubscription(idSub){
 
     console.log('PAYU GET SUBSCRIPTION STATUS: ', status );
     console.log("ERROR WHILE GETTING SUBSCRIPTION: ", payU.description);
-    return "ERROR_ " + payU.description; 
+    return "ERROR_" + status + "_" + payU.description;
 }
 
 exports.deleteSubscription = async function deleteSubscription(idSub){
@@ -147,6 +146,6 @@ exports.deleteSubscription = async function deleteSubscription(idSub){
     payU = await payU.json()
     console.log('PAYU DELETE SUBSCRIPTION STATUS: ', status );
     console.log("ERROR WHILE DELETING SUBSCRIPTION: ", payU.description);
-    return "ERROR_ " + payU.description;
+    return "ERROR_" + status + "_" + payU.description;
 
 }

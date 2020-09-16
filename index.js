@@ -28,53 +28,57 @@ app.post('/CreateDonation', async (req, res) => {
 
     let planCode = await plan.createPlanPago(dataReq.AmountForm.amount, dataReq.AmountForm.duration);
     if(planCode.startsWith('ERROR_')) {
-        planCode = planCode.replace('ERROR_ ', '');
-        res.status(400).send(JSON.stringify({"error": planCode}));
+        planCode = planCode.split('_');
+        res.status(planCode[1]).send(JSON.stringify({"error": planCode[2]}));
     }
-
-    let clienteId = await cliente.createClient(dataReq.DonatorForm.fullNameClient, dataReq.DonatorForm.emailClient);
-    if (clienteId.startsWith('ERROR_')){
-        clienteId = clienteId.replace('ERROR_ ', '');
-        res.status(400).send(JSON.stringify({"error": clienteId}));
-    }
-
-    let cardToken = await tarjeta.createCard(clienteId, dataReq.CardForm.cardNumber, dataReq.CardForm.cardOwner, 
-                                            dataReq.CardForm.idOwnerNumber, dataReq.CardForm.expMonth, dataReq.CardForm.expYear,
-                                            dataReq.CardForm.cardType, dataReq.CardForm.address, '', '', dataReq.CardForm.city, '', 
-                                            dataReq.CardForm.country, '', dataReq.CardForm.phoneNumber);
-    if (cardToken.startsWith('ERROR_')){
-        cardToken = cardToken.replace('ERROR_ ', '');
-        res.status(400).send(JSON.stringify({"error": cardToken}));
-    }
-
-    let subscriptionId = await suscripcion.createSubscription(planCode,clienteId,cardToken);
-    if (subscriptionId.startsWith('ERROR_')){
-        subscriptionId = subscriptionId.replace('ERROR_ ', '');
-        res.status(400).send(JSON.stringify({"error": suscriptionID}));
-    }
-
-    //Conexión con API Podio
-    let today = new Date();
-    let dataPodio = {
-        "fechaDonacion": today.getFullYear()+"-"+(today.getMonth()+1)+"-"+today.getDate(),
-        "nombre": dataReq.DonatorForm.fullNameClient,
-        "documento": dataReq.DonatorForm.idNumberClient,
-        "email": dataReq.DonatorForm.emailClient,
-        "telefono": dataReq.CardForm.phoneNumber,
-        "amount": dataReq.AmountForm.amount,
-        "nPagos": dataReq.AmountForm.duration,
-        "tokenID": cardToken,
-        "clienteID": clienteId,
-        "planID": planCode,
-        "suscriptionID": subscriptionId
-    }
-
-    let resPodio = await podio.createDonationPodio(confPodio, dataPodio);
-    if (resPodio === 200) res.status(201).send(JSON.stringify({"planCode": planCode,"id": clienteId, "token": cardToken, "subscriptionId": subscriptionId}));
     else{
-        res.status(400).send(JSON.stringify({"error": resPodio}));
+
+        let clienteId = await cliente.createClient(dataReq.DonatorForm.fullNameClient, dataReq.DonatorForm.emailClient);
+        if (clienteId.startsWith('ERROR_')){
+            clienteId = clienteId.split('_');
+            res.status(clienteId[1]).send(JSON.stringify({"error": clienteId[2]}));
+        }
+        else{
+            let cardToken = await tarjeta.createCard(clienteId, dataReq.CardForm.cardNumber, dataReq.CardForm.cardOwner, 
+                dataReq.CardForm.idOwnerNumber, dataReq.CardForm.expMonth, dataReq.CardForm.expYear,
+                dataReq.CardForm.cardType, dataReq.CardForm.address, '', '', dataReq.CardForm.city, '', 
+                dataReq.CardForm.country, '', dataReq.CardForm.phoneNumber);
+            if (cardToken.startsWith('ERROR_')){
+                cardToken = cardToken.split('_');
+                res.status(cardToken[1]).send(JSON.stringify({"error": cardToken[2]}));
+            }
+            else{
+                let subscriptionId = await suscripcion.createSubscription(planCode,clienteId,cardToken);
+                if (subscriptionId.startsWith('ERROR_')){
+                    subscriptionId = subscriptionId.split('_');
+                    res.status(subscriptionId[1]).send(JSON.stringify({"error": subscriptionId[2]}));
+                }
+                else{
+                    //Conexión con API Podio
+                    let today = new Date();
+                    let dataPodio = {
+                        "fechaDonacion": today.getFullYear()+"-"+(today.getMonth()+1)+"-"+today.getDate(),
+                        "nombre": dataReq.DonatorForm.fullNameClient,
+                        "documento": dataReq.DonatorForm.idNumberClient,
+                        "email": dataReq.DonatorForm.emailClient,
+                        "telefono": dataReq.CardForm.phoneNumber,
+                        "amount": dataReq.AmountForm.amount,
+                        "nPagos": dataReq.AmountForm.duration,
+                        "tokenID": cardToken,
+                        "clienteID": clienteId,
+                        "planID": planCode,
+                        "suscriptionID": subscriptionId
+                    }
+                
+                    let resPodio = await podio.createDonationPodio(confPodio, dataPodio);
+                    if (resPodio === 200) res.status(201).send(JSON.stringify({"planCode": planCode,"id": clienteId, "token": cardToken, "subscriptionId": subscriptionId}));
+                    else{
+                        res.status(400).send(JSON.stringify({"error": resPodio}));
+                    }                    
+                }                
+            }
+        }
     }
-       
 });
 
 app.delete('/DeleteDonation', async (req, res) => {
@@ -103,6 +107,8 @@ app.delete('/DeleteDonation', async (req, res) => {
     } */
 })
 
+//Direccionamiento para el front de la app
+app.use("/", express.static('./public'));
 
 // Confirmación por consola que corre la app
 app.listen(port, () => {

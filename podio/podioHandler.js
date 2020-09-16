@@ -46,7 +46,7 @@ exports.newItem = async function newItem(appId, data, appPid, appTk){
     })
     .catch( error => {
       console.log(error)
-      res = 400;
+      res = error;
     })
     return res;
 }

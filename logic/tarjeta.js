@@ -1,9 +1,8 @@
 const fetch = require('node-fetch');
 const cors = require('cors');
 const config = require('../config.json');
-const ENDPOINT = config.test.endPoint;
-const authorization = config.test.authorization;
-const acountID = config.test.acountID;
+const ENDPOINT = config.production.endPoint;
+const authorization = config.production.authorization;
 
 ref = 0;
 
@@ -54,7 +53,7 @@ exports.createCard = async function createCard(clienteId, number, name, document
     
     console.log('PAYU CREATE CARD STATUS: ', status );
     console.log("ERROR WHILE CREATING CARD: ", payU.description);
-    return "ERROR_ " + payU.description;
+    return "ERROR_" + status + "_" + payU.description;
     
 }
 
@@ -102,7 +101,7 @@ exports.updateCard = async function updateCard(token, number, name, document, ex
     
     console.log('PAYU UPDATE CARD STATUS: ', status );
     console.log("ERROR WHILE UPDATE CARD: ", payU.description);
-    return "ERROR_ " + payU.description;
+    return "ERROR_" + status + "_" + payU.description;
        
 }
 
@@ -129,7 +128,7 @@ exports.getCard = async function getCard(token){
     if(status === 200) return payU;
     console.log('PAYU GET CARD STATUS: ', status );
     console.log("ERROR WHILE GETTING CARD: ", payU.description);
-    return "ERROR_ " + payU.description;
+    return "ERROR_" + status + "_" + payU.description;
     
 }
 
@@ -157,5 +156,5 @@ exports.deleteCard = async function deleteCard(clienteId, token){
     payU = await payU.json()
     console.log('PAYU DELETE CARD STATUS: ', status );
     console.log("ERROR WHILE DELETING CARD: ", payU.description);
-    return "ERROR_ " + payU.description;
+    return "ERROR_" + status + "_" + payU.description;
 }
