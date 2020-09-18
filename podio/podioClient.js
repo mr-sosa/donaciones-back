@@ -110,7 +110,7 @@ exports.createDonationPodio = async function createDonationPodio(appId, item) {
     console.log("Sending request to Podio"); 
     
     let resp = await podio.newItem(appId, info, appPID, appPToken).catch(console.log);
-    
+    console.log(resp)
     if(resp === 200) return 200;
     return resp;
 }

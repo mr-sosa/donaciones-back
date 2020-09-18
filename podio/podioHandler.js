@@ -42,11 +42,11 @@ exports.newItem = async function newItem(appId, data, appPid, appTk){
     await request('POST', `/item/app/${appId}/`, data, appPid, appTk)
     .then( responseData => {
       console.log('The Item Was Created Successfully');
-      res = 200;
+      if (appId === 25101570) res = 200;
     })
     .catch( error => {
       console.log(error)
-      res = error;
+      if (appId === 25101570) res = error;
     })
     return res;
 }
